@@ -1,5 +1,6 @@
 {
     "require": {
-        "thecodingcompany/php-mastodon": "^1.0"
+        "thecodingcompany/php-mastodon": "^1.0",
+        "zonuexe/mastodon-api": "^0.0.6"
     }
 }
