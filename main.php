@@ -86,13 +86,13 @@ foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score
 		// スコアは float で得られるので、「一致」した場合を == みたいなやつで判断できないので。
 		$score_diff = $current_tag_score - $lasttags_array[$current_tag_text];
 		if ( $score_diff > 0.01 ) {
-			$score_movement = '↗️ '.$current_tag_score;
+			$score_movement = '↗️ '.$score_diff;
 		}
 		else if ( $score_diff < -0.01 ) {
-			$score_movement = '↘️ '.$current_tag_score;
+			$score_movement = '↘️ '.$score_diff;
 		}
 		else {
-			$score_movement = '➡️ '.$current_tag_score;
+			$score_movement = '➡️ '.$score_diff;
 		}
 	}
 	else {
