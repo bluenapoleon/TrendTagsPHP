@@ -77,7 +77,7 @@ foreach ( $lasttags_log as $lasttags_log_oneline ) {
 $report_tags = array();
 $save_tags = array();
 foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score ) {
-	$report_tag = ':hash: '.$current_tag_text.' ['.$current_tag_score.']';
+	$report_tag = '#️⃣ '.$current_tag_text.' ['.$current_tag_score.']';
 	// トレンドタグが前回報告した一覧にも存在するかチェック
 	if ( array_key_exists($current_tag_text, $lasttags_array) === TRUE ) {
 		// 存在する場合はこちら
@@ -86,13 +86,13 @@ foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score
 		// スコアは float で得られるので、「一致」した場合を == みたいなやつで判断できないので。
 		$score_diff = $current_tag_score - $lasttags_array[$current_tag_text];
 		if ( $score_diff > 0.01 ) {
-			$score_movement = ':arrow_upper_right: '.$current_tag_score;
+			$score_movement = '↗️ '.$current_tag_score;
 		}
 		else if ( $score_diff < -0.01 ) {
-			$score_movement = ':arrow_lower_right: '.$current_tag_score;
+			$score_movement = '↘️ '.$current_tag_score;
 		}
 		else {
-			$score_movement = ':arrow_right: '.$current_tag_score;
+			$score_movement = '➡️ '.$current_tag_score;
 		}
 	}
 	else {
@@ -109,6 +109,12 @@ foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score
 print_r($report_tags);
 
 // 作成したトレンドタグ報告文に、1 つ以上のハッシュタグが含まれる場合、トゥートする
+if ( count($report_tags) > 0) {
+	require_once("MastodonClient/MastodonClient.php");
+	$mc = new MastodonClient();
+	$mc->init();
+	$mc->post_statuses(MastodonClient::VISIBILITY_UNLISTED, implode("\n", $report_tags));
+}
 
 // ここまで処理成功したら、前回のタグ一覧とかを保存する
 file_put_contents("lasttags.txt", implode("\n", $save_tags));
