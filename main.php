@@ -19,6 +19,9 @@ define("EXEC_MODE_DIFF", 1);
 define("EXEC_MODE_HIGH", 2);
 define("EXEC_MODE_UNKNOWN", 0);
 
+// 報告するタグの数
+define("REPORT_TAGS_NUM", 5);
+
 $options = getopt("m:n");
 
 // 必須オプションが指定されているか検査
@@ -77,36 +80,36 @@ foreach ( $lasttags_log as $lasttags_log_oneline ) {
 $report_tags = array();
 $save_tags = array();
 foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score ) {
-	$report_tag = '#️⃣ '.$current_tag_text.' ['.$current_tag_score.']';
-	// トレンドタグが前回報告した一覧にも存在するかチェック
-	if ( array_key_exists($current_tag_text, $lasttags_array) === TRUE ) {
-		// 存在する場合はこちら
-		// スコアが上昇したか下降したかチェック
-		// スコアは 0.01 以上の変化が見られた場合にだけ上昇/下降した、と判断する
-		// スコアは float で得られるので、「一致」した場合を == みたいなやつで判断できないので。
-		$score_diff = $current_tag_score - $lasttags_array[$current_tag_text];
-		if ( $score_diff > 0.01 ) {
-			$score_movement = '↗️ '.$score_diff;
-		}
-		else if ( $score_diff < -0.01 ) {
-			$score_movement = '↘️ '.$score_diff;
+	if ( count($report_tags) < REPORT_TAGS_NUM ) {
+		$report_tag = '#️⃣ '.$current_tag_text.' ['.$current_tag_score.']';
+		// トレンドタグが前回報告した一覧にも存在するかチェック
+		if ( array_key_exists($current_tag_text, $lasttags_array) === TRUE ) {
+			// 存在する場合はこちら
+			// スコアが上昇したか下降したかチェック
+			// スコアは 0.01 以上の変化が見られた場合にだけ上昇/下降した、と判断する
+			// スコアは float で得られるので、「一致」した場合を == みたいなやつで判断できないので。
+			$score_diff = $current_tag_score - $lasttags_array[$current_tag_text];
+			if ( $score_diff > 0.01 ) {
+				$score_movement = '↗️ '.$score_diff;
+			}
+			else if ( $score_diff < -0.01 ) {
+				$score_movement = '↘️ '.$score_diff;
+			}
+			else {
+				$score_movement = '➡️ '.$score_diff;
+			}
 		}
 		else {
-			$score_movement = '➡️ '.$score_diff;
+			// 存在しない場合はこちら
+			$score_movement = 'NEW';
 		}
+		$report_tag .= '[ '.$score_movement.' ]';
+		$report_tags[] = $report_tag;
 	}
-	else {
-		// 存在しない場合はこちら
-		$score_movement = 'NEW';
-	}
-	$report_tag .= '[ '.$score_movement.' ]';
-	$report_tags[] = $report_tag;
 
 	// 保存用のデータを作成する
 	$save_tags[] = $current_tag_text.','.$current_tag_score;
 }
-
-print_r($report_tags);
 
 // 作成したトレンドタグ報告文に、1 つ以上のハッシュタグが含まれる場合、トゥートする
 if ( count($report_tags) > 0) {
