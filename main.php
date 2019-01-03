@@ -51,7 +51,7 @@ switch ( $options['m'] ) {
 $trend_tags_result = json_decode(file_get_contents("https://imastodon.blue/api/v1/trend_tags"), TRUE);
 
 // トレンドタグ更新日時を DateTime オブジェクトにする
-$trend_tags_updated_at = new DateTime($trend_tags_result['updated_at']);
+$trend_tags_updated_at = new DateTime($trend_tags_result['updated_at'], new DateTimeZone('UTC'));
 
 // 前回報告したトレンドタグの更新タイミングより新しいかチェック
 $lasttime_log = @file_get_contents("lasttime.txt");
@@ -64,6 +64,9 @@ if ( !isset($options['d']) && ($lasttime_log >= $trend_tags_updated_at->getTimes
 	fprintf(STDERR, "トレンドタグの更新がありません。処理を終了します。");
 	exit(0);
 }
+
+// トレンドタグの時間を JST に変換
+$trend_tags_updated_at->setTimezone(new DateTimeZone("Asia/Tokyo"));
 
 // 前回報告したトレンドタグの一覧を取得する
 $lasttags_log = @file("lasttags.txt", FILE_SKIP_EMPTY_LINES);
@@ -137,17 +140,22 @@ foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score
 // 作成したトレンドタグ報告文に、1 つ以上のハッシュタグが含まれる場合、かつ
 // 順位変化がある場合、トゥートする
 if ( (count($report_tags) > 0) && ($rank_diff === TRUE) ) {
+	// トレンドタグの更新時刻を作成
+	$updated_at_text = $trend_tags_updated_at->format("H:i")." 現在のトレンドタグ".PHP_EOL.PHP_EOL;
+	$toot_text = $updated_at_text.implode("\n", $report_tags);
+
 	if ( isset($options['n']) ) {
-		echo implode("\n", $report_tags).PHP_EOL;
+		echo $toot_text.PHP_EOL;
 	}
 	else {
 		require_once("MastodonClient/MastodonClient.php");
 		$mc = new MastodonClient();
 		$mc->init();
-		$mc->post_statuses(MastodonClient::VISIBILITY_UNLISTED, implode("\n", $report_tags));
+		$mc->post_statuses(MastodonClient::VISIBILITY_UNLISTED, $toot_text);
 	}
 }
 
 // ここまで処理成功したら、前回のタグ一覧とかを保存する
+$trend_tags_updated_at->setTimezone(new DateTimeZone("UTC"));
 file_put_contents("lasttags.txt", implode("\n", $save_tags));
 file_put_contents("lasttime.txt", $trend_tags_updated_at->getTimestamp());
