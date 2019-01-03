@@ -12,6 +12,7 @@
 //      :   d で diff を意味する前回のトレンドスコア更新時との差分を報告します。
 //      :   h で high を意味する前日のトレンドスコアのハイスコアを報告します。
 //   -n : この引数を指定すると、報告せずに報告内容を標準出力に出力します。
+//   -d : デバッグモードで動作します。トレンドタグの更新有無にかかわらず、最後まで動作します。
 //
 // - - - - - - - - - - - - - - - - - - - -
 
@@ -22,7 +23,7 @@ define("EXEC_MODE_UNKNOWN", 0);
 // 報告するタグの数
 define("REPORT_TAGS_NUM", 5);
 
-$options = getopt("m:n");
+$options = getopt("m:nd");
 
 // 必須オプションが指定されているか検査
 if ( !isset($options['m']) ) {
@@ -58,7 +59,7 @@ if ( $lasttime_log === FALSE ) {
 	// 前回報告したトレンドタグの更新タイミングが見当たらない場合は強制 0
 	$lasttime_log = 0;
 }
-if ( $lasttime_log >= $trend_tags_updated_at->getTimestamp() ) {
+if ( !isset($options['d']) && ($lasttime_log >= $trend_tags_updated_at->getTimestamp()) ) {
 	// 新しいトレンドタグ更新がないので処理終了
 	fprintf(STDERR, "トレンドタグの更新がありません。処理を終了します。");
 	exit(0);
