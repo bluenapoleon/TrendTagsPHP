@@ -130,10 +130,15 @@ foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score
 // 作成したトレンドタグ報告文に、1 つ以上のハッシュタグが含まれる場合、かつ
 // 順位変化がある場合、トゥートする
 if ( (count($report_tags) > 0) && ($rank_diff === TRUE) ) {
-	require_once("MastodonClient/MastodonClient.php");
-	$mc = new MastodonClient();
-	$mc->init();
-	$mc->post_statuses(MastodonClient::VISIBILITY_UNLISTED, implode("\n", $report_tags));
+	if ( isset($options['n']) ) {
+		echo implode("\n", $report_tags).PHP_EOL;
+	}
+	else {
+		require_once("MastodonClient/MastodonClient.php");
+		$mc = new MastodonClient();
+		$mc->init();
+		$mc->post_statuses(MastodonClient::VISIBILITY_UNLISTED, implode("\n", $report_tags));
+	}
 }
 
 // ここまで処理成功したら、前回のタグ一覧とかを保存する
