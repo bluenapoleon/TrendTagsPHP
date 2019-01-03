@@ -125,7 +125,7 @@ foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score
 			// 新しいタグがトレンドに新規掲載になったので、トゥート必要
 			$rank_diff = TRUE;
 		}
-		$report_tag .= '[ '.$score_movement.' ]';
+		$report_tag .= '['.$score_movement.']';
 		$report_tags[] = $report_tag;
 	}
 
