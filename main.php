@@ -77,8 +77,14 @@ foreach ( $lasttags_log as $lasttags_log_oneline ) {
 	$lasttags_array_score[$last_tag_text] = $last_tag_score;
 
 	// ログバージョンが古い場合、last_tag_rank がへんな値になってる可能性があるので、ガード
-	if ( !isset($last_tag_rank) || !is_int($last_tag_rank) || ($last_tag_rank <= 0) ) {
+	if ( !isset($last_tag_rank) ) {
 		$last_tag_rank = 0;
+	}
+	else {
+		$last_tag_rank = intval($last_tag_rank);
+		if ( $last_tag_rank <= 0 ) {
+			$last_tag_rank = 0;
+		}
 	}
 	$lasttags_array_rank[$last_tag_text] = $last_tag_rank;
 }
