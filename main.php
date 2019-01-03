@@ -121,6 +121,9 @@ foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score
 			if ( $lasttags_array_rank[$current_tag_text] != $current_rank ) {
 				$rank_diff = TRUE;
 			}
+
+			// トレンドタグの順位変化完了マーキング
+			$lasttags_array_rank[$current_tag_text] = 0;
 		}
 		else {
 			// 存在しない場合はこちら
@@ -135,6 +138,19 @@ foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score
 	// 保存用のデータを作成する
 	$save_tags[] = $current_tag_text.','.$current_tag_score.','.$current_rank;
 	$current_rank++;
+}
+
+// トレンドタグの順位変化完了マーキングがすべて完了しているかチェック
+if ( $rank_diff !== TRUE ) {
+	arsort($lasttags_array_rank);
+	foreach ( $lasttags_array_rank as $rank_value ) {
+		if ( $rank_value > 0 ) {
+			// 降順ソートをおこなって先頭にランク 0 以外のデータが存在する場合
+			// それは今回のトレンドタグから消え去ったものと判断
+			$rank_diff = TRUE;
+		}
+		break;
+	}
 }
 
 // 作成したトレンドタグ報告文に、1 つ以上のハッシュタグが含まれる場合、かつ
