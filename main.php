@@ -127,7 +127,7 @@ foreach ( $trend_tags_result['score'] as $current_tag_text => $current_tag_score
 		}
 		else {
 			// 存在しない場合はこちら
-			$score_movement = 'NEW';
+			$score_movement = '🆕';
 			// 新しいタグがトレンドに新規掲載になったので、トゥート必要
 			$rank_diff = TRUE;
 		}
